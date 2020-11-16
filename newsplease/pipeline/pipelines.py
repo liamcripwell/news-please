@@ -718,6 +718,24 @@ class DateFilter(object):
                 return item
 
 
+class DiscourseFilter(object):
+
+    patterns = None
+
+    def __init__(self):
+        import importlib
+        # import nltk
+        self.log = logging.getLogger(__name__ + '.DiscourseFilter')
+        self.cfg = CrawlerConfig.get_instance()
+        self.config = self.cfg.section("DiscourseFilter")
+        self.patterns = importlib.import_module(self.config['patterns_module']).PATTERNS
+
+    def process_item(self, item, spider):
+        print(self.patterns)
+
+        return item
+
+
 class PandasStorage(ExtractedInformationStorage):
     """
     Store meta data a Pandas data frame

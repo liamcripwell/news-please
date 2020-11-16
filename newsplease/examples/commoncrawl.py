@@ -54,7 +54,7 @@ my_reuse_previously_downloaded_files = True
 # continue after error
 my_continue_after_error = True
 # show the progress of downloading the WARC files
-my_show_download_progress = False
+my_show_download_progress = True #False
 # log_level
 my_log_level = logging.INFO
 # json export style
