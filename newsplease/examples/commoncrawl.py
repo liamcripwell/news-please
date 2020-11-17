@@ -62,10 +62,13 @@ my_json_export_style = 1  # 0 (minimize), 1 (pretty)
 # number of extraction processes
 my_number_of_extraction_processes = 1
 # if True, the WARC file will be deleted after all articles have been extracted from it
-my_delete_warc_after_extraction = True
+my_delete_warc_after_extraction = False #True
 # if True, will continue extraction from the latest fully downloaded but not fully extracted WARC files and then
 # crawling new WARC files. This assumes that the filter criteria have not been changed since the previous run!
 my_continue_process = True
+
+my_filter_discourse_connectives = True
+my_patterns_module = "discourse.connectives"
 ############ END YOUR CONFIG #########
 
 
@@ -105,6 +108,7 @@ def on_valid_article_extracted(article):
     :param article:
     :return:
     """
+    # TODO: store valid sentence pairs in file
     # do whatever you need to do with the article (e.g., save it to disk, store it in ElasticSearch, etc.)
     with open(__get_pretty_filepath(my_local_download_dir_article, article), 'w', encoding='utf-8') as outfile:
         if my_json_export_style == 0:
@@ -165,7 +169,9 @@ def main():
                                                number_of_extraction_processes=my_number_of_extraction_processes,
                                                log_level=my_log_level,
                                                delete_warc_after_extraction=my_delete_warc_after_extraction,
-                                               continue_process=True)
+                                               continue_process=True,
+                                               filter_discourse_connectives=my_filter_discourse_connectives,
+                                               patterns_module=my_patterns_module)
 
 
 if __name__ == "__main__":

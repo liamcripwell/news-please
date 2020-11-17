@@ -9,7 +9,9 @@ import os
 import subprocess
 import sys
 import time
+import importlib
 
+import nltk
 from ago import human
 from dateutil import parser
 from hurry.filesize import size
@@ -58,7 +60,8 @@ class CommonCrawlExtractor:
     # if the download progress is shown
     __show_download_progress = False
 
-    __patterns_module = "discourse.patterns"
+    __filter_discourse_connectives = False
+    __patterns_module = None
 
     # logging
     logging.basicConfig(level=__log_level)
@@ -132,9 +135,9 @@ class CommonCrawlExtractor:
                     return False, article
 
         # filter by discourse pattern
-        import importlib
-        patterns = importlib.import_module(self.__patterns_module).PATTERNS
-        print(patterns)
+        if self.__filter_discourse_connectives and self.__patterns_module:
+            patterns = importlib.import_module(self.__patterns_module).PATTERNS
+            print(patterns)
 
         return True, article
 
@@ -320,6 +323,7 @@ class CommonCrawlExtractor:
                                  strict_date=True, reuse_previously_downloaded_files=True, local_download_dir_warc=None,
                                  continue_after_error=True, show_download_progress=False,
                                  log_level=logging.ERROR, delete_warc_after_extraction=True,
+                                 filter_discourse_connectives=False, patterns_module=None,
                                  log_pathname_fully_extracted_warcs=None):
         """
         Crawl and extract articles form the news crawl provided by commoncrawl.org. For each article that was extracted
@@ -355,6 +359,8 @@ class CommonCrawlExtractor:
         self.__show_download_progress = show_download_progress
         self.__log_level = log_level
         self.__delete_warc_after_extraction = delete_warc_after_extraction
+        self.__filter_discourse_connectives = filter_discourse_connectives
+        self.__patterns_module = patterns_module
         self.__log_pathname_fully_extracted_warcs = log_pathname_fully_extracted_warcs
 
         self.__run()
