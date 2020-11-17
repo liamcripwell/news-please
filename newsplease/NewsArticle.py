@@ -18,6 +18,7 @@ class NewsArticle(object):
     title_page = None
     title_rss = None
     url = None
+    extracted_samples = []
 
     def get_serializable_dict(self):
         """

@@ -54,7 +54,7 @@ my_reuse_previously_downloaded_files = True
 # continue after error
 my_continue_after_error = True
 # show the progress of downloading the WARC files
-my_show_download_progress = False
+my_show_download_progress = True #False
 # log_level
 my_log_level = logging.INFO
 # json export style
@@ -62,10 +62,14 @@ my_json_export_style = 1  # 0 (minimize), 1 (pretty)
 # number of extraction processes
 my_number_of_extraction_processes = 1
 # if True, the WARC file will be deleted after all articles have been extracted from it
-my_delete_warc_after_extraction = True
+my_delete_warc_after_extraction = False #True
 # if True, will continue extraction from the latest fully downloaded but not fully extracted WARC files and then
 # crawling new WARC files. This assumes that the filter criteria have not been changed since the previous run!
 my_continue_process = True
+
+my_filter_discourse_connectives = True
+my_patterns_module = "discourse.connectives"
+my_warc_files_list = ["2016/08/CC-NEWS-20160827132735-00002.warc.gz"]
 ############ END YOUR CONFIG #########
 
 
@@ -105,13 +109,20 @@ def on_valid_article_extracted(article):
     :param article:
     :return:
     """
+    # TODO: store valid sentence pairs in file
     # do whatever you need to do with the article (e.g., save it to disk, store it in ElasticSearch, etc.)
     with open(__get_pretty_filepath(my_local_download_dir_article, article), 'w', encoding='utf-8') as outfile:
-        if my_json_export_style == 0:
-            json.dump(article.__dict__, outfile, default=str, separators=(',', ':'), ensure_ascii=False)
-        elif my_json_export_style == 1:
-            json.dump(article.__dict__, outfile, default=str, indent=4, sort_keys=True, ensure_ascii=False)
-        # ...
+        if my_filter_discourse_connectives:
+            if my_json_export_style == 0:
+                json.dump(article.extracted_samples, outfile, default=str, separators=(',', ':'), ensure_ascii=False)
+            elif my_json_export_style == 1:
+                json.dump(article.extracted_samples, outfile, default=str, indent=4, sort_keys=True, ensure_ascii=False)
+        else:
+            if my_json_export_style == 0:
+                json.dump(article.__dict__, outfile, default=str, separators=(',', ':'), ensure_ascii=False)
+            elif my_json_export_style == 1:
+                json.dump(article.__dict__, outfile, default=str, indent=4, sort_keys=True, ensure_ascii=False)
+            # ...
 
 
 def callback_on_warc_completed(warc_path, counter_article_passed, counter_article_discarded,
@@ -165,7 +176,10 @@ def main():
                                                number_of_extraction_processes=my_number_of_extraction_processes,
                                                log_level=my_log_level,
                                                delete_warc_after_extraction=my_delete_warc_after_extraction,
-                                               continue_process=True)
+                                               continue_process=True,
+                                               filter_discourse_connectives=my_filter_discourse_connectives,
+                                               patterns_module=my_patterns_module,
+                                               warc_files_list=my_warc_files_list)
 
 
 if __name__ == "__main__":
