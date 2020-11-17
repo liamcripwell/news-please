@@ -222,7 +222,8 @@ def __start_commoncrawl_extractor(warc_download_url, callback_on_article_extract
                                   continue_process=True,
                                   filter_discourse_connectives=False,
                                   patterns_module=None,
-                                  log_pathname_fully_extracted_warcs=None):
+                                  log_pathname_fully_extracted_warcs=None,
+                                  languages=None):
     """
     Starts a single CommonCrawlExtractor
     :param warc_download_url:
@@ -253,7 +254,8 @@ def __start_commoncrawl_extractor(warc_download_url, callback_on_article_extract
                                                    delete_warc_after_extraction=delete_warc_after_extraction,
                                                    filter_discourse_connectives=filter_discourse_connectives,
                                                    patterns_module=patterns_module,
-                                                   log_pathname_fully_extracted_warcs=__log_pathname_fully_extracted_warcs)
+                                                   log_pathname_fully_extracted_warcs=__log_pathname_fully_extracted_warcs,
+                                                   languages=languages)
 
 
 def crawl_from_commoncrawl(callback_on_article_extracted, callback_on_warc_completed=None, valid_hosts=None,
@@ -263,7 +265,7 @@ def crawl_from_commoncrawl(callback_on_article_extracted, callback_on_warc_compl
                            number_of_extraction_processes=4, log_level=logging.ERROR,
                            delete_warc_after_extraction=True, continue_process=True,
                            filter_discourse_connectives=False, patterns_module=None,
-                           warc_files_list=None):
+                           warc_files_list=None, languages=None):
     """
     Crawl and extract articles form the news crawl provided by commoncrawl.org. For each article that was extracted
     successfully the callback function callback_on_article_extracted is invoked where the first parameter is the
@@ -331,7 +333,8 @@ def crawl_from_commoncrawl(callback_on_article_extracted, callback_on_warc_compl
                                                 delete_warc_after_extraction=delete_warc_after_extraction,
                                                 filter_discourse_connectives=filter_discourse_connectives,
                                                 patterns_module=patterns_module,
-                                                log_pathname_fully_extracted_warcs=__log_pathname_fully_extracted_warcs),
+                                                log_pathname_fully_extracted_warcs=__log_pathname_fully_extracted_warcs,
+                                                languages=languages),
                                         warc_download_urls)
     else:
         for warc_download_url in warc_download_urls:
@@ -349,4 +352,5 @@ def crawl_from_commoncrawl(callback_on_article_extracted, callback_on_warc_compl
                                           delete_warc_after_extraction=delete_warc_after_extraction,
                                           filter_discourse_connectives=filter_discourse_connectives,
                                           patterns_module=patterns_module,
-                                          log_pathname_fully_extracted_warcs=__log_pathname_fully_extracted_warcs)
+                                          log_pathname_fully_extracted_warcs=__log_pathname_fully_extracted_warcs,
+                                          languages=languages)

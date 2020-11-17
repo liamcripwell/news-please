@@ -70,6 +70,7 @@ my_continue_process = True
 my_filter_discourse_connectives = True
 my_patterns_module = "discourse.connectives"
 my_warc_files_list = ["2016/08/CC-NEWS-20160827132735-00002.warc.gz"]
+my_languages = ["en"]
 ############ END YOUR CONFIG #########
 
 
@@ -179,7 +180,8 @@ def main():
                                                continue_process=True,
                                                filter_discourse_connectives=my_filter_discourse_connectives,
                                                patterns_module=my_patterns_module,
-                                               warc_files_list=my_warc_files_list)
+                                               warc_files_list=my_warc_files_list,
+                                               languages=my_languages)
 
 
 if __name__ == "__main__":
