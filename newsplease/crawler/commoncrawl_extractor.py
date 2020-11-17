@@ -142,9 +142,13 @@ class CommonCrawlExtractor:
             if not article:
                 article = NewsPlease.from_warc(warc_record)
             
-            content = article.get_dict()["maintext"]
-            sentences = [s.lower().strip().replace("\n", "") for s in nltk.sent_tokenize(content)]
+            content = article.maintext
+            if not content:
+                return False, article
             
+            sentences = [s.lower().strip().replace("\n", "") for s in nltk.sent_tokenize(content)]
+
+            article.extracted_samples = []
             for i in range(1, len(sentences)):
                 matched = False
                 for sense, patterns in PATTERNS.items():
@@ -292,6 +296,7 @@ class CommonCrawlExtractor:
                                 article = NewsPlease.from_warc(record)
                             counter_article_passed += 1
 
+                            self.__logger.info(f"{len(article.extracted_samples)} discourse pairs extracted")
                             self.__logger.info('article pass (%s; %s; %s)', article.source_domain, article.date_publish,
                                                article.title)
                             self.__callback_on_article_extracted(article)
