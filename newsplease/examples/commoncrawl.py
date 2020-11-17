@@ -46,7 +46,7 @@ my_filter_start_date = None  # datetime.datetime(2016, 1, 1)
 # end date (if None, any date is OK as end date), as datetime
 my_filter_end_date = None  # datetime.datetime(2016, 12, 31)
 # if date filtering is strict and news-please could not detect the date of an article, the article will be discarded
-my_warc_files_start_date = datetime.datetime(2016, 8, 27) #None # example: datetime.datetime(2020, 3, 1)
+my_warc_files_start_date = None # example: datetime.datetime(2020, 3, 1)
 my_filter_strict_date = True
 # if True, the script checks whether a file has been downloaded already and uses that file instead of downloading
 # again. Note that there is no check whether the file has been downloaded completely or is valid!
@@ -69,6 +69,7 @@ my_continue_process = True
 
 my_filter_discourse_connectives = True
 my_patterns_module = "discourse.connectives"
+my_warc_files_list = ["2016/08/CC-NEWS-20160827132735-00002.warc.gz"]
 ############ END YOUR CONFIG #########
 
 
@@ -177,7 +178,8 @@ def main():
                                                delete_warc_after_extraction=my_delete_warc_after_extraction,
                                                continue_process=True,
                                                filter_discourse_connectives=my_filter_discourse_connectives,
-                                               patterns_module=my_patterns_module)
+                                               patterns_module=my_patterns_module,
+                                               warc_files_list=my_warc_files_list)
 
 
 if __name__ == "__main__":

@@ -100,7 +100,7 @@ def __iterate_by_month(start_date, end_date, month_step=1):
                                             month=new_month)
 
 
-def __get_remote_index(warc_files_start_date):
+def __get_remote_index(warc_files_start_date, warc_files_list=None):
     """
     Gets the index of news crawl files from commoncrawl.org and returns an array of names
     :return:
@@ -122,11 +122,15 @@ def __get_remote_index(warc_files_start_date):
         except OSError:
             pass
 
-        warc_dates = __iterate_by_month(warc_files_start_date, warc_files_start_date + datetime.timedelta(days=30))#datetime.datetime.today())
+        warc_dates = __iterate_by_month(warc_files_start_date, datetime.datetime.today())
         for date in warc_dates:
             year = date.strftime('%Y')
             month = date.strftime('%m')
-            cmd += "aws s3 ls --recursive s3://commoncrawl/crawl-data/CC-NEWS/%s/%s/CC-NEWS-20160827132735-00002.warc.gz --no-sign-request >> %s && " % (year, month, temp_filename)
+            cmd += "aws s3 ls --recursive s3://commoncrawl/crawl-data/CC-NEWS/%s/%s/ >> %s && " % (year, month, temp_filename)
+
+    elif warc_files_list:
+        for warc_file in warc_files_list:
+            cmd += "aws s3 ls --recursive s3://commoncrawl/crawl-data/CC-NEWS/%s --no-sign-request >> %s && " % (warc_file, temp_filename)
 
     else:
         cmd = "aws s3 ls --recursive s3://commoncrawl/crawl-data/CC-NEWS/ --no-sign-request > %s && " % temp_filename
@@ -258,7 +262,8 @@ def crawl_from_commoncrawl(callback_on_article_extracted, callback_on_warc_compl
                            continue_after_error=True, show_download_progress=False,
                            number_of_extraction_processes=4, log_level=logging.ERROR,
                            delete_warc_after_extraction=True, continue_process=True,
-                           filter_discourse_connectives=False, patterns_module=None):
+                           filter_discourse_connectives=False, patterns_module=None,
+                           warc_files_list=None):
     """
     Crawl and extract articles form the news crawl provided by commoncrawl.org. For each article that was extracted
     successfully the callback function callback_on_article_extracted is invoked where the first parameter is the
@@ -283,7 +288,7 @@ def crawl_from_commoncrawl(callback_on_article_extracted, callback_on_warc_compl
     global __extern_callback_on_warc_completed
     __extern_callback_on_warc_completed = callback_on_warc_completed
 
-    cc_news_crawl_names = __get_remote_index(warc_files_start_date)
+    cc_news_crawl_names = __get_remote_index(warc_files_start_date, warc_files_list)
     global __number_of_warc_files_on_cc
     __number_of_warc_files_on_cc = len(cc_news_crawl_names)
     __logger.info('found %i files at commoncrawl.org', __number_of_warc_files_on_cc)
