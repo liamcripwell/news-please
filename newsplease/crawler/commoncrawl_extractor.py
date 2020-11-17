@@ -58,6 +58,8 @@ class CommonCrawlExtractor:
     # if the download progress is shown
     __show_download_progress = False
 
+    __patterns_module = "discourse.patterns"
+
     # logging
     logging.basicConfig(level=__log_level)
     __logger = logging.getLogger(__name__)
@@ -128,6 +130,11 @@ class CommonCrawlExtractor:
                     return False, article
                 if self.__filter_end_date and publishing_date > self.__filter_end_date:
                     return False, article
+
+        # filter by discourse pattern
+        import importlib
+        patterns = importlib.import_module(self.__patterns_module).PATTERNS
+        print(patterns)
 
         return True, article
 
