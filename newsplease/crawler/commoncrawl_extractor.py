@@ -10,6 +10,7 @@ import subprocess
 import sys
 import time
 import importlib
+import re
 
 import nltk
 from ago import human
@@ -136,8 +137,35 @@ class CommonCrawlExtractor:
 
         # filter by discourse pattern
         if self.__filter_discourse_connectives and self.__patterns_module:
-            patterns = importlib.import_module(self.__patterns_module).PATTERNS
-            print(patterns)
+            PATTERNS = importlib.import_module(self.__patterns_module).PATTERNS
+
+            if not article:
+                article = NewsPlease.from_warc(warc_record)
+            
+            content = article.get_dict()["maintext"]
+            sentences = [s.lower().strip().replace("\n", "") for s in nltk.sent_tokenize(content)]
+            
+            for i in range(1, len(sentences)):
+                matched = False
+                for sense, patterns in PATTERNS.items():
+                    for name, pattern in patterns.items():
+                        # check if  pattern matches
+                        if re.search(pattern, sentences[i]) is not None:
+                            extract = {
+                                "sense": sense,
+                                "connective": name,
+                                "sentence1": sentences[i-1],
+                                "sentence2": sentences[i],
+                            }
+                            article.extracted_samples.append(extract)
+                            matched = True
+                            print(f"Found an instance of \"{sense}\"")
+                            break
+                    if matched:
+                        break
+
+            if len(article.extracted_samples) == 0:
+                return False, article
 
         return True, article
 
