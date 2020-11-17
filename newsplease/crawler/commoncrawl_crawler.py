@@ -122,11 +122,11 @@ def __get_remote_index(warc_files_start_date):
         except OSError:
             pass
 
-        warc_dates = __iterate_by_month(warc_files_start_date, datetime.datetime.today())
+        warc_dates = __iterate_by_month(warc_files_start_date, warc_files_start_date + datetime.timedelta(days=30))#datetime.datetime.today())
         for date in warc_dates:
             year = date.strftime('%Y')
             month = date.strftime('%m')
-            cmd += "aws s3 ls --recursive s3://commoncrawl/crawl-data/CC-NEWS/%s/%s/ --no-sign-request >> %s && " % (year, month, temp_filename)
+            cmd += "aws s3 ls --recursive s3://commoncrawl/crawl-data/CC-NEWS/%s/%s/CC-NEWS-20160827132735-00002.warc.gz --no-sign-request >> %s && " % (year, month, temp_filename)
 
     else:
         cmd = "aws s3 ls --recursive s3://commoncrawl/crawl-data/CC-NEWS/ --no-sign-request > %s && " % temp_filename

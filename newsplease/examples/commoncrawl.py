@@ -46,7 +46,7 @@ my_filter_start_date = None  # datetime.datetime(2016, 1, 1)
 # end date (if None, any date is OK as end date), as datetime
 my_filter_end_date = None  # datetime.datetime(2016, 12, 31)
 # if date filtering is strict and news-please could not detect the date of an article, the article will be discarded
-my_warc_files_start_date = None # example: datetime.datetime(2020, 3, 1)
+my_warc_files_start_date = datetime.datetime(2016, 8, 27) #None # example: datetime.datetime(2020, 3, 1)
 my_filter_strict_date = True
 # if True, the script checks whether a file has been downloaded already and uses that file instead of downloading
 # again. Note that there is no check whether the file has been downloaded completely or is valid!
