@@ -156,7 +156,9 @@ class CommonCrawlExtractor:
             if not content:
                 return False, article
             
-            sentences = [s.lower().strip().replace("\n", "") for s in nltk.sent_tokenize(content)]
+            cased_sentences = [s.strip().replace("\n", "") for s in nltk.sent_tokenize(content)]
+            sentences = [s.lower() for s in cased_sentences]
+            assert len(cased_sentences) == len(sentences)
 
             article.extracted_samples = []
             for i in range(1, len(sentences)):
@@ -168,8 +170,8 @@ class CommonCrawlExtractor:
                             extract = {
                                 "sense": sense,
                                 "connective": name,
-                                "sentence1": sentences[i-1],
-                                "sentence2": sentences[i],
+                                "sentence1": cased_sentences[i-1],
+                                "sentence2": cased_sentences[i],
                             }
                             article.extracted_samples.append(extract)
                             matched = True
