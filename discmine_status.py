@@ -1,4 +1,5 @@
 import os
+import time
 import json
 import subprocess
 
@@ -7,8 +8,10 @@ import fire
 
 def summarize(in_dir):
     samples = {}
+    mod_times = []
     for root, dirs, files in os.walk(in_dir):
         for name in files:
+            mod_times.append(os.path.getmtime(os.path.join(root, name)))
             doc = json.load(open(os.path.join(root, name), "r"))
 
             for sample in doc:
@@ -24,7 +27,9 @@ def summarize(in_dir):
         print(f"{k}{' '*(25-len(k))}{v}")
 
     print(f"Total samples mined: {sum([x for x in samples.values()])}")
-    print(f"\nTime since first match: {0}")
+
+    first_write = time.ctime(min(mod_times))
+    print(f"\nMine started: {first_write}")
     print(f"Disk space used: {disk_usage}")
 
 
