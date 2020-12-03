@@ -57,7 +57,7 @@ def get_connective_counts(filename):
 
     return con_counts
 
-def summarize(in_dir):
+def summarize(in_dir, num_procs=4):
     docs = []
     samples = {}
     mod_times = []
@@ -68,7 +68,7 @@ def summarize(in_dir):
             docs.append(doc_name)
             mod_times.append(os.path.getmtime(doc_name))
 
-    with Pool(4) as status_pool:
+    with Pool(num_procs) as status_pool:
         connective_counts = np.stack(status_pool.map(get_connective_counts, docs)).sum(axis=0)
     
     for i, c in enumerate(CONNECTIVES):
