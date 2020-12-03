@@ -45,7 +45,7 @@ CONNECTIVES = [
     "instead",
     "rather",
 ]
-CDICT = {CONNECTIVES[i]: i for i in range(len(connectives))}
+CDICT = {CONNECTIVES[i]: i for i in range(len(CONNECTIVES))}
 
 
 def get_connective_counts(filename):
@@ -69,7 +69,7 @@ def summarize(in_dir):
             mod_times.append(os.path.getmtime(doc_name))
 
     with Pool(4) as status_pool:
-        connective_counts = np.stack(status_pool.map(get_connective_counts, docs))
+        connective_counts = np.stack(status_pool.map(get_connective_counts, docs)).sum(axis=0)
     
     for i, c in enumerate(CONNECTIVES):
         print(f"{c}{' '*(25-len(c))}{connective_counts[i]}")
