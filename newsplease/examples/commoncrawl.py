@@ -62,14 +62,14 @@ my_json_export_style = 1  # 0 (minimize), 1 (pretty)
 # number of extraction processes
 my_number_of_extraction_processes = 1
 # if True, the WARC file will be deleted after all articles have been extracted from it
-my_delete_warc_after_extraction = False #True
+my_delete_warc_after_extraction = True
 # if True, will continue extraction from the latest fully downloaded but not fully extracted WARC files and then
 # crawling new WARC files. This assumes that the filter criteria have not been changed since the previous run!
 my_continue_process = True
 
 my_filter_discourse_connectives = True
 my_patterns_module = "discourse.connectives"
-my_warc_files_list = ["2016/08/CC-NEWS-20160827132735-00002.warc.gz"]
+my_warc_files_list = None #["2016/08/CC-NEWS-20160827132735-00002.warc.gz"]
 my_languages = ["en"]
 ############ END YOUR CONFIG #########
 
