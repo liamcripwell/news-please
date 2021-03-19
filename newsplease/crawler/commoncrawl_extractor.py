@@ -164,16 +164,16 @@ class CommonCrawlExtractor:
             # look for potential discourse matches to extract
             article.extracted_samples = []
             if self.__filter_adverbial_pair:
-                article.extracted_samples += _extract_discourse_simple(sentences, cased_sentences)
+                article.extracted_samples += __extract_discourse_simple(sentences, cased_sentences)
             if self.__filter_connective_sent:
-                article.extracted_samples += _extract_discourse_complex(sentences, cased_sentences)
+                article.extracted_samples += __extract_discourse_complex(sentences, cased_sentences)
 
             if len(article.extracted_samples) == 0:
                 return False, article
 
         return True, article
 
-    def _extract_discourse_simple(self, sentences, cased_sentences):
+    def __extract_discourse_simple(self, sentences, cased_sentences):
         PATTERNS = importlib.import_module(self.__patterns_module).PATTERNS
 
         extracted = []
@@ -196,7 +196,7 @@ class CommonCrawlExtractor:
                     break
         return extracted
 
-    def _extract_discourse_complex(self, sentences, cased_sentences):
+    def __extract_discourse_complex(self, sentences, cased_sentences):
         INNERS = importlib.import_module(self.__patterns_module).INNERS
         FORWARDS = importlib.import_module(self.__patterns_module).FORWARDS
 
