@@ -359,8 +359,8 @@ class CommonCrawlExtractor:
                                 article = NewsPlease.from_warc(record)
                             counter_article_passed += 1
 
-                            if self.__filter_adverbial_pair:
-                                self.__logger.info(f"{len(article.extracted_samples)} discourse pairs extracted")
+                            if self.__filter_adverbial_pair or self.__filter_connective_sent:
+                                self.__logger.info(f"{len(article.extracted_samples)} discourse items extracted")
 
                             self.__logger.info('article pass (%s; %s; %s)', article.source_domain, article.date_publish,
                                                article.title)
