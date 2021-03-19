@@ -211,6 +211,7 @@ class CommonCrawlExtractor:
                     match = re.search(pattern, sentence)
                     if match is not None:
                         extract = {
+                            "i": i,
                             "type": "inner",
                             "adverbial": adverbial,
                             "connective": inner,
@@ -225,6 +226,7 @@ class CommonCrawlExtractor:
                     match = re.search(pattern, sentence)
                     if match is not None:
                         extract = {
+                            "i": i,
                             "type": "forward",
                             "adverbial": adverbial,
                             "connective": conn,
