@@ -206,7 +206,7 @@ class CommonCrawlExtractor:
 
             # look for inner connective
             for adverbial, inners in INNERS.items():
-                for inner in [adverbial] + inners:
+                for inner in list(set([adverbial] + inners)):
                     pattern = f"(,? {inner},? )"
                     match = re.search(pattern, sentence)
                     if match is not None:
