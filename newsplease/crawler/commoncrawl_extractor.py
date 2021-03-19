@@ -148,7 +148,6 @@ class CommonCrawlExtractor:
 
         # filter by discourse pattern
         if (self.__filter_adverbial_pair or self.__filter_connective_sent) and self.__patterns_module:
-            PATTERNS = importlib.import_module(self.__patterns_module).PATTERNS
 
             if not article:
                 article = NewsPlease.from_warc(warc_record)
@@ -157,10 +156,12 @@ class CommonCrawlExtractor:
             if not content:
                 return False, article
             
+            # keep cased and uncased version of the sentences
             cased_sentences = [s.strip().replace("\n", "") for s in nltk.sent_tokenize(content)]
             sentences = [s.lower() for s in cased_sentences]
             assert len(cased_sentences) == len(sentences)
 
+            # look for potential discourse matches to extract
             article.extracted_samples = []
             if self.__filter_adverbial_pair:
                 article.extracted_samples += _extract_discourse_simple(sentences, cased_sentences)
@@ -172,7 +173,9 @@ class CommonCrawlExtractor:
 
         return True, article
 
-    def _extract_discourse_simple(sentences, cased_sentences):
+    def _extract_discourse_simple(self, sentences, cased_sentences):
+        PATTERNS = importlib.import_module(self.__patterns_module).PATTERNS
+
         extracted = []
         for i in range(1, len(sentences)):
             matched = False
@@ -193,8 +196,45 @@ class CommonCrawlExtractor:
                     break
         return extracted
 
-    def _extract_discourse_complex(sentences):
-        pass
+    def _extract_discourse_complex(self, sentences, cased_sentences):
+        INNERS = importlib.import_module(self.__patterns_module).INNERS
+        FORWARDS = importlib.import_module(self.__patterns_module).FORWARDS
+
+        extracted = []
+        for i, sentence in enumerate(sentences):
+            extracts = []
+
+            # look for inner connective
+            for adverbial, inners in INNERS.items():
+                for inner in [adverbial] + inners:
+                    pattern = f"(,? {inner},? )"
+                    match = re.search(pattern, sentence)
+                    if match is not None:
+                        extract = {
+                            "type": "inner",
+                            "adverbial": adverbial,
+                            "connective": inner,
+                            "sentence": cased_sentences[i],
+                        }
+                        extracts.append(extract)
+
+            # look for forward connective
+            for adverbial, conns in FORWARDS.items():
+                for conn in conns:
+                    pattern = f"(^{conn} (?!,))"
+                    match = re.search(pattern, sentence)
+                    if match is not None:
+                        extract = {
+                            "type": "forward",
+                            "adverbial": adverbial,
+                            "connective": conn,
+                            "sentence": cased_sentences[i],
+                        }
+                        extracts.append(extract)
+
+            extracted += extracts
+
+        return extracted
 
     def __get_publishing_date(self, warc_record, article):
         """
