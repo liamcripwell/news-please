@@ -61,7 +61,7 @@ class CommonCrawlExtractor:
     # if the download progress is shown
     __show_download_progress = False
 
-    __filter_discourse_connectives = False
+    __filter_adverbial_pair = False
     __patterns_module = None
     __languages = None
 
@@ -146,7 +146,7 @@ class CommonCrawlExtractor:
                 return False, article
 
         # filter by discourse pattern
-        if self.__filter_discourse_connectives and self.__patterns_module:
+        if self.__filter_adverbial_pair and self.__patterns_module:
             PATTERNS = importlib.import_module(self.__patterns_module).PATTERNS
 
             if not article:
@@ -308,7 +308,7 @@ class CommonCrawlExtractor:
                                 article = NewsPlease.from_warc(record)
                             counter_article_passed += 1
 
-                            if self.__filter_discourse_connectives:
+                            if self.__filter_adverbial_pair:
                                 self.__logger.info(f"{len(article.extracted_samples)} discourse pairs extracted")
 
                             self.__logger.info('article pass (%s; %s; %s)', article.source_domain, article.date_publish,
@@ -370,7 +370,7 @@ class CommonCrawlExtractor:
                                  strict_date=True, reuse_previously_downloaded_files=True, local_download_dir_warc=None,
                                  continue_after_error=True, show_download_progress=False,
                                  log_level=logging.ERROR, delete_warc_after_extraction=True,
-                                 filter_discourse_connectives=False, patterns_module=None,
+                                 filter_adverbial_pair=False, patterns_module=None,
                                  log_pathname_fully_extracted_warcs=None, languages=None):
         """
         Crawl and extract articles form the news crawl provided by commoncrawl.org. For each article that was extracted
@@ -406,7 +406,8 @@ class CommonCrawlExtractor:
         self.__show_download_progress = show_download_progress
         self.__log_level = log_level
         self.__delete_warc_after_extraction = delete_warc_after_extraction
-        self.__filter_discourse_connectives = filter_discourse_connectives
+        self.__filter_adverbial_pair = filter_adverbial_pair
+        self.__filter_connective_sent = filter_connective_sent
         self.__patterns_module = patterns_module
         self.__log_pathname_fully_extracted_warcs = log_pathname_fully_extracted_warcs
         self.__languages = languages
