@@ -232,6 +232,9 @@ class CommonCrawlExtractor:
                         }
                         extracts.append(extract)
 
+            # ignore sentences with more than 3 connectives
+            if len(extracts) > 3:
+                extracts = []
             extracted += extracts
 
         return extracted
