@@ -166,7 +166,7 @@ class CommonCrawlExtractor:
             if self.__filter_adverbial_pair:
                 article.extracted_samples += _extract_discourse_simple(sentences, cased_sentences)
             if self.__filter_connective_sent:
-            article.extracted_samples += _extract_discourse_complex(sentences, cased_sentences)
+                article.extracted_samples += _extract_discourse_complex(sentences, cased_sentences)
 
             if len(article.extracted_samples) == 0:
                 return False, article
