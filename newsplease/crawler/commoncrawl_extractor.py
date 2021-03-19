@@ -62,6 +62,7 @@ class CommonCrawlExtractor:
     __show_download_progress = False
 
     __filter_adverbial_pair = False
+    __filter_connective_sent = False
     __patterns_module = None
     __languages = None
 
@@ -146,7 +147,7 @@ class CommonCrawlExtractor:
                 return False, article
 
         # filter by discourse pattern
-        if self.__filter_adverbial_pair and self.__patterns_module:
+        if (self.__filter_adverbial_pair or self.__filter_connective_sent) and self.__patterns_module:
             PATTERNS = importlib.import_module(self.__patterns_module).PATTERNS
 
             if not article:
@@ -161,29 +162,39 @@ class CommonCrawlExtractor:
             assert len(cased_sentences) == len(sentences)
 
             article.extracted_samples = []
-            for i in range(1, len(sentences)):
-                matched = False
-                for sense, patterns in PATTERNS.items():
-                    for name, pattern in patterns.items():
-                        # check if  pattern matches
-                        if re.search(pattern, sentences[i]) is not None:
-                            extract = {
-                                "sense": sense,
-                                "connective": name,
-                                "sentence1": cased_sentences[i-1],
-                                "sentence2": cased_sentences[i],
-                            }
-                            article.extracted_samples.append(extract)
-                            matched = True
-                            print(f"Found an instance of \"{sense}\"")
-                            break
-                    if matched:
-                        break
+            if self.__filter_adverbial_pair:
+                article.extracted_samples += _extract_discourse_simple(sentences, cased_sentences)
+            if self.__filter_connective_sent:
+            article.extracted_samples += _extract_discourse_complex(sentences, cased_sentences)
 
             if len(article.extracted_samples) == 0:
                 return False, article
 
         return True, article
+
+    def _extract_discourse_simple(sentences, cased_sentences):
+        extracted = []
+        for i in range(1, len(sentences)):
+            matched = False
+            for sense, patterns in PATTERNS.items():
+                for name, pattern in patterns.items():
+                    if re.search(pattern, sentences[i]) is not None:
+                        extract = {
+                            "sense": sense,
+                            "connective": name,
+                            "sentence1": cased_sentences[i-1],
+                            "sentence2": cased_sentences[i],
+                        }
+                        extracted.append(extract)
+                        matched = True
+                        print(f"Found an instance of \"{sense}\"")
+                        break
+                if matched:
+                    break
+        return extracted
+
+    def _extract_discourse_complex(sentences):
+        pass
 
     def __get_publishing_date(self, warc_record, article):
         """
