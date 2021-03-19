@@ -421,7 +421,7 @@ class CommonCrawlExtractor:
                                  strict_date=True, reuse_previously_downloaded_files=True, local_download_dir_warc=None,
                                  continue_after_error=True, show_download_progress=False,
                                  log_level=logging.ERROR, delete_warc_after_extraction=True,
-                                 filter_adverbial_pair=False, patterns_module=None,
+                                 filter_adverbial_pair=False, filter_connective_sent=False, patterns_module=None,
                                  log_pathname_fully_extracted_warcs=None, languages=None):
         """
         Crawl and extract articles form the news crawl provided by commoncrawl.org. For each article that was extracted
