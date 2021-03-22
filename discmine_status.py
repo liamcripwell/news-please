@@ -17,7 +17,9 @@ ADV_IDX = {ADVS[i]: i for i in range(len(ADVS))}
 CONN_IDX = {CONNS[i]: i for i in range(len(CONNS))}
 
 
-def get_connective_counts(filename, conn_type="adverbial"):
+def get_connective_counts(args):
+    filename, conn_type = args
+
     if conn_type == "adverbial":
         options = ADV_IDX
     else:
@@ -39,11 +41,11 @@ def summarize(in_dir, conn_type="adverbial", num_procs=4):
     for root, dirs, files in os.walk(in_dir):
         for name in files:
             doc_name = os.path.join(root, name)
-            docs.append(doc_name)
+            docs.append((doc_name, conn_type))
             mod_times.append(os.path.getmtime(doc_name))
 
     with Pool(num_procs) as status_pool:
-        connective_counts = np.stack(status_pool.map(get_connective_counts, product(docs, conn_type=conn_type))).sum(axis=0)
+        connective_counts = np.stack(status_pool.map(get_connective_counts, docs)).sum(axis=0)
     
     for i, c in enumerate(CONNECTIVES):
         print(f"{c}{' '*(25-len(c))}{connective_counts[i]}")
