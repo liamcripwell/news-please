@@ -31,6 +31,8 @@ def get_connective_counts(args):
 
     doc = json.load(open(filename, "r"))
     for sample in doc:
+        if ref_attr not in sample:
+            continue
         con_counts[options[sample[ref_attr]]] += 1
 
     return con_counts
