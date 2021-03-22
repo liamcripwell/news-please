@@ -11,7 +11,7 @@ import fire
 from discourse.connectives import PATTERNS, INNERS, FORWARDS
 
 ADVS = [adv for sense in PATTERNS.values() for adv in sense.keys()]
-CONNS = list(set([c for c in ] + list(FORWARDS.keys())))
+CONNS = list(set(list(INNERS.keys()) + list(FORWARDS.keys())))
 
 ADV_IDX = {ADVS[i]: i for i in range(len(ADVS))}
 CONN_IDX = {CONNS[i]: i for i in range(len(CONNS))}
