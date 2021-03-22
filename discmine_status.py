@@ -11,7 +11,7 @@ import fire
 from discourse.connectives import PATTERNS, INNERS, FORWARDS
 
 ADVS = [adv for sense in PATTERNS.values() for adv in sense.keys()]
-CONNS = list(set(list(INNERS.keys()) + list(FORWARDS.keys())))
+CONNS = list(set([c for c in ] + list(FORWARDS.keys())))
 
 ADV_IDX = {ADVS[i]: i for i in range(len(ADVS))}
 CONN_IDX = {CONNS[i]: i for i in range(len(CONNS))}
@@ -22,14 +22,16 @@ def get_connective_counts(args):
 
     if conn_type == "adverbial":
         options = ADV_IDX
+        ref_attr = "connective"
     else:
         options = CONN_IDX
+        ref_attr = "adverbial"
 
     con_counts = np.zeros(len(options))
 
     doc = json.load(open(filename, "r"))
     for sample in doc:
-        con_counts[options[sample["connective"]]] += 1
+        con_counts[options[sample[ref_attr]]] += 1
 
     return con_counts
 
