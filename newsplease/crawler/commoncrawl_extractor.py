@@ -61,7 +61,8 @@ class CommonCrawlExtractor:
     # if the download progress is shown
     __show_download_progress = False
 
-    __filter_discourse_connectives = False
+    __filter_adverbial_pair = False
+    __filter_connective_sent = False
     __patterns_module = None
     __languages = None
 
@@ -146,8 +147,7 @@ class CommonCrawlExtractor:
                 return False, article
 
         # filter by discourse pattern
-        if self.__filter_discourse_connectives and self.__patterns_module:
-            PATTERNS = importlib.import_module(self.__patterns_module).PATTERNS
+        if (self.__filter_adverbial_pair or self.__filter_connective_sent) and self.__patterns_module:
 
             if not article:
                 article = NewsPlease.from_warc(warc_record)
@@ -156,34 +156,90 @@ class CommonCrawlExtractor:
             if not content:
                 return False, article
             
+            # keep cased and uncased version of the sentences
             cased_sentences = [s.strip().replace("\n", "") for s in nltk.sent_tokenize(content)]
             sentences = [s.lower() for s in cased_sentences]
             assert len(cased_sentences) == len(sentences)
 
+            # look for potential discourse matches to extract
             article.extracted_samples = []
-            for i in range(1, len(sentences)):
-                matched = False
-                for sense, patterns in PATTERNS.items():
-                    for name, pattern in patterns.items():
-                        # check if  pattern matches
-                        if re.search(pattern, sentences[i]) is not None:
-                            extract = {
-                                "sense": sense,
-                                "connective": name,
-                                "sentence1": cased_sentences[i-1],
-                                "sentence2": cased_sentences[i],
-                            }
-                            article.extracted_samples.append(extract)
-                            matched = True
-                            print(f"Found an instance of \"{sense}\"")
-                            break
-                    if matched:
-                        break
+            if self.__filter_adverbial_pair:
+                article.extracted_samples += self.__extract_discourse_simple(sentences, cased_sentences)
+            if self.__filter_connective_sent:
+                article.extracted_samples += self.__extract_discourse_complex(sentences, cased_sentences)
 
             if len(article.extracted_samples) == 0:
                 return False, article
 
         return True, article
+
+    def __extract_discourse_simple(self, sentences, cased_sentences):
+        PATTERNS = importlib.import_module(self.__patterns_module).PATTERNS
+
+        extracted = []
+        for i in range(1, len(sentences)):
+            matched = False
+            for sense, patterns in PATTERNS.items():
+                for name, pattern in patterns.items():
+                    if re.search(pattern, sentences[i]) is not None:
+                        extract = {
+                            "sense": sense,
+                            "connective": name,
+                            "sentence1": cased_sentences[i-1],
+                            "sentence2": cased_sentences[i],
+                        }
+                        extracted.append(extract)
+                        matched = True
+                        print(f"Found an instance of \"{sense}\"")
+                        break
+                if matched:
+                    break
+        return extracted
+
+    def __extract_discourse_complex(self, sentences, cased_sentences):
+        INNERS = importlib.import_module(self.__patterns_module).INNERS
+        FORWARDS = importlib.import_module(self.__patterns_module).FORWARDS
+
+        extracted = []
+        for i, sentence in enumerate(sentences):
+            extracts = []
+
+            # look for inner connective
+            for adverbial, inners in INNERS.items():
+                for inner in list(set([adverbial] + inners)):
+                    pattern = f"(,? {inner},? )"
+                    match = re.search(pattern, sentence)
+                    if match is not None:
+                        extract = {
+                            "i": i,
+                            "type": "inner",
+                            "adverbial": adverbial,
+                            "connective": inner,
+                            "sentence": cased_sentences[i],
+                        }
+                        extracts.append(extract)
+
+            # look for forward connective
+            for adverbial, conns in FORWARDS.items():
+                for conn in conns:
+                    pattern = f"(^{conn} (?!,))"
+                    match = re.search(pattern, sentence)
+                    if match is not None:
+                        extract = {
+                            "i": i,
+                            "type": "forward",
+                            "adverbial": adverbial,
+                            "connective": conn,
+                            "sentence": cased_sentences[i],
+                        }
+                        extracts.append(extract)
+
+            # ignore sentences with more than 3 connectives
+            if len(extracts) > 3:
+                extracts = []
+            extracted += extracts
+
+        return extracted
 
     def __get_publishing_date(self, warc_record, article):
         """
@@ -308,8 +364,8 @@ class CommonCrawlExtractor:
                                 article = NewsPlease.from_warc(record)
                             counter_article_passed += 1
 
-                            if self.__filter_discourse_connectives:
-                                self.__logger.info(f"{len(article.extracted_samples)} discourse pairs extracted")
+                            if self.__filter_adverbial_pair or self.__filter_connective_sent:
+                                self.__logger.info(f"{len(article.extracted_samples)} discourse items extracted")
 
                             self.__logger.info('article pass (%s; %s; %s)', article.source_domain, article.date_publish,
                                                article.title)
@@ -370,7 +426,7 @@ class CommonCrawlExtractor:
                                  strict_date=True, reuse_previously_downloaded_files=True, local_download_dir_warc=None,
                                  continue_after_error=True, show_download_progress=False,
                                  log_level=logging.ERROR, delete_warc_after_extraction=True,
-                                 filter_discourse_connectives=False, patterns_module=None,
+                                 filter_adverbial_pair=False, filter_connective_sent=False, patterns_module=None,
                                  log_pathname_fully_extracted_warcs=None, languages=None):
         """
         Crawl and extract articles form the news crawl provided by commoncrawl.org. For each article that was extracted
@@ -406,7 +462,8 @@ class CommonCrawlExtractor:
         self.__show_download_progress = show_download_progress
         self.__log_level = log_level
         self.__delete_warc_after_extraction = delete_warc_after_extraction
-        self.__filter_discourse_connectives = filter_discourse_connectives
+        self.__filter_adverbial_pair = filter_adverbial_pair
+        self.__filter_connective_sent = filter_connective_sent
         self.__patterns_module = patterns_module
         self.__log_pathname_fully_extracted_warcs = log_pathname_fully_extracted_warcs
         self.__languages = languages

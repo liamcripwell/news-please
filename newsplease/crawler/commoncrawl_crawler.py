@@ -220,7 +220,8 @@ def __start_commoncrawl_extractor(warc_download_url, callback_on_article_extract
                                   log_level=logging.ERROR,
                                   delete_warc_after_extraction=True,
                                   continue_process=True,
-                                  filter_discourse_connectives=False,
+                                  filter_adverbial_pair=False,
+                                  filter_connective_sent=False,
                                   patterns_module=None,
                                   log_pathname_fully_extracted_warcs=None,
                                   languages=None):
@@ -252,7 +253,8 @@ def __start_commoncrawl_extractor(warc_download_url, callback_on_article_extract
                                                    show_download_progress=show_download_progress,
                                                    log_level=log_level,
                                                    delete_warc_after_extraction=delete_warc_after_extraction,
-                                                   filter_discourse_connectives=filter_discourse_connectives,
+                                                   filter_adverbial_pair=filter_adverbial_pair,
+                                                   filter_connective_sent=filter_connective_sent,
                                                    patterns_module=patterns_module,
                                                    log_pathname_fully_extracted_warcs=__log_pathname_fully_extracted_warcs,
                                                    languages=languages)
@@ -264,8 +266,8 @@ def crawl_from_commoncrawl(callback_on_article_extracted, callback_on_warc_compl
                            continue_after_error=True, show_download_progress=False,
                            number_of_extraction_processes=4, log_level=logging.ERROR,
                            delete_warc_after_extraction=True, continue_process=True,
-                           filter_discourse_connectives=False, patterns_module=None,
-                           warc_files_list=None, languages=None):
+                           filter_adverbial_pair=False, filter_connective_sent=False, 
+                           patterns_module=None, warc_files_list=None, languages=None):
     """
     Crawl and extract articles form the news crawl provided by commoncrawl.org. For each article that was extracted
     successfully the callback function callback_on_article_extracted is invoked where the first parameter is the
@@ -331,7 +333,8 @@ def crawl_from_commoncrawl(callback_on_article_extracted, callback_on_warc_compl
                                                 show_download_progress=show_download_progress,
                                                 log_level=log_level,
                                                 delete_warc_after_extraction=delete_warc_after_extraction,
-                                                filter_discourse_connectives=filter_discourse_connectives,
+                                                filter_adverbial_pair=filter_adverbial_pair,
+                                                filter_connective_sent=filter_connective_sent,
                                                 patterns_module=patterns_module,
                                                 log_pathname_fully_extracted_warcs=__log_pathname_fully_extracted_warcs,
                                                 languages=languages),
@@ -350,7 +353,8 @@ def crawl_from_commoncrawl(callback_on_article_extracted, callback_on_warc_compl
                                           show_download_progress=show_download_progress,
                                           log_level=log_level,
                                           delete_warc_after_extraction=delete_warc_after_extraction,
-                                          filter_discourse_connectives=filter_discourse_connectives,
+                                          filter_adverbial_pair=filter_adverbial_pair,
+                                          filter_connective_sent=filter_connective_sent,
                                           patterns_module=patterns_module,
                                           log_pathname_fully_extracted_warcs=__log_pathname_fully_extracted_warcs,
                                           languages=languages)

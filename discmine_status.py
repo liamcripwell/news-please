@@ -2,62 +2,42 @@ import os
 import time
 import json
 import subprocess
+from itertools import product
 from multiprocessing import Pool
 
 import numpy as np
 import fire
 
-CONNECTIVES = [
-    "afterward(s)",
-    "after that",
-    "eventually",
-    "in turn",
-    "later",
-    "next",
-    "thereafter",
-    "before that",
-    "earlier",
-    "previously",
-    "in the meantime",
-    "meanwhile",
-    "simultaneously",
-    "accordingly",
-    "as a result",
-    "consequently",
-    "therefore",
-    "thus",
-    "additionally",
-    "also",
-    "besides",
-    "further(more)",
-    "in addition",
-    "likewise",
-    "moreover",
-    "similarly",
-    "by/in comparison",
-    "by/in contrast",
-    "conversely",
-    "nevertheless",
-    "on the other hand",
-    "for example",
-    "for instance",
-    "in particular",
-    "instead",
-    "rather",
-]
-CDICT = {CONNECTIVES[i]: i for i in range(len(CONNECTIVES))}
+from discourse.connectives import PATTERNS, INNERS, FORWARDS
+
+ADVS = [adv for sense in PATTERNS.values() for adv in sense.keys()]
+CONNS = list(set(list(INNERS.keys()) + list(FORWARDS.keys())))
+
+ADV_IDX = {ADVS[i]: i for i in range(len(ADVS))}
+CONN_IDX = {CONNS[i]: i for i in range(len(CONNS))}
 
 
-def get_connective_counts(filename):
-    con_counts = np.zeros(len(CONNECTIVES))
+def get_connective_counts(args):
+    filename, conn_type = args
+
+    if conn_type == "adverbial":
+        options = ADV_IDX
+        ref_attr = "connective"
+    else:
+        options = CONN_IDX
+        ref_attr = "adverbial"
+
+    con_counts = np.zeros(len(options))
 
     doc = json.load(open(filename, "r"))
     for sample in doc:
-        con_counts[CDICT[sample["connective"]]] += 1
+        if ref_attr not in sample:
+            continue
+        con_counts[options[sample[ref_attr]]] += 1
 
     return con_counts
 
-def summarize(in_dir, num_procs=4):
+def summarize(in_dir, conn_type="adverbial", num_procs=4):
     docs = []
     samples = {}
     mod_times = []
@@ -65,7 +45,7 @@ def summarize(in_dir, num_procs=4):
     for root, dirs, files in os.walk(in_dir):
         for name in files:
             doc_name = os.path.join(root, name)
-            docs.append(doc_name)
+            docs.append((doc_name, conn_type))
             mod_times.append(os.path.getmtime(doc_name))
 
     with Pool(num_procs) as status_pool:
