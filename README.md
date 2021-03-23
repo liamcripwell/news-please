@@ -1,5 +1,15 @@
 # **news-please** #
 
+## Discourse-Related Modifications
+Changes have been made to the [common crawl extractor](https://github.com/liamcripwell/news-please/blob/master/newsplease/crawler/commoncrawl_extractor.py) to allow for extraction of sentences and sentence pairs containing one of the discourse markers defined in `discourse/connectives.py`. Specific settings for a job of this kind are configured [here](https://github.com/liamcripwell/news-please/blob/master/newsplease/examples/commoncrawl.py).
+
+A job is then started by running the following in the home directory of the project:
+```bash
+python3 -m newsplease.examples.commoncrawl
+```
+
+---
+
 [![PyPI version](https://img.shields.io/pypi/v/news-please.svg)](https://pypi.org/project/news-please/)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4120316.svg)](http://dx.doi.org/10.5281/zenodo.4120316)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=XX272QZV9A2FN&source=url)
