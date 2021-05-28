@@ -29,7 +29,7 @@ PATTERNS = {
         "additionally": "^additionally",
         "also": "^also", # followed by a pronoun?
         "besides": "^besides",
-        "further(more)": "^furthermore", # followed by pronoun if just "further"?
+        "furthermore": "^furthermore", # followed by pronoun if just "further"?
         "in addition": "^in addition", # followed by , or pronoun?
         "likewise": "^likewise",
         "moreover": "^moreover",
